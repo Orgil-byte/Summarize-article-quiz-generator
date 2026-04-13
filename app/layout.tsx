@@ -34,45 +34,37 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden min-h-screen bg-zinc-800`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex flex-col">
-          <ClerkProvider>
-            <header className="flex justify-end items-center p-4 gap-4 h-16 bg-white border-b border-[#E4E4E7]">
+        <ClerkProvider>
+          <div className="flex flex-col h-screen">
+            <header className="flex justify-end items-center p-4 h-16 bg-white border-b border-zinc-200 shrink-0 text-black fixed w-full">
               <Show when="signed-out">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl border border-zinc-200 p-2 hover:bg-neutral-700 hover:text-white cursor-pointer transition-colors duration-300">
-                    <SignInButton />
-                  </div>
+                  <SignInButton />
                   <p>Or</p>
-                  <div className="rounded-xl border border-zinc-200 p-2 hover:bg-neutral-700 hover:text-white cursor-pointer transition-colors duration-300">
-                    <SignUpButton />
-                  </div>
+                  <SignUpButton />
                 </div>
               </Show>
               <Show when="signed-in">
                 <div className="w-full flex justify-between items-center">
                   <h1 className="font-medium text-[24px]">Quiz app</h1>
-                  <div className="w-fit h-fit">
-                    <UserButton />
-                  </div>
+                  <UserButton />
                 </div>
               </Show>
             </header>
 
             <SidebarProvider
               defaultOpen={false}
-              style={
-                {
-                  "--sidebar-width-icon": "72px",
-                } as React.CSSProperties
-              }
+              style={{ "--sidebar-width-icon": "72px" } as React.CSSProperties}
             >
-              <AppSidebar />
-              <main>{children}</main>
+              <div className="flex flex-1 overflow-hidden">
+                <AppSidebar />
+                <main className="flex-1 overflow-y-auto">{children}</main>
+              </div>
             </SidebarProvider>
-          </ClerkProvider>
-        </div>
+          </div>
+        </ClerkProvider>
       </body>
     </html>
   );
