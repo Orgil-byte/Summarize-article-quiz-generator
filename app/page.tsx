@@ -17,3 +17,7 @@
 //     </div>
 //   );
 // }
+
+export default function Home() {
+  return <div>efwf</div>;
+}
