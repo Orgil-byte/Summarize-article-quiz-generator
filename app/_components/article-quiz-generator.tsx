@@ -2,17 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, FileText } from "lucide-react";
+import { Sparkles, FileText, LoaderCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { generateSummary } from "../utils/generateSummary";
+import { saveArticleAction } from "../api/routes/article-quiz.routes";
+import { useUser } from "@clerk/nextjs";
+import { ArticleGeneratorSuccess } from "./articleGeneratorSuccess";
 
 type ArticleQuizGeneratorProps = {
   content: string;
   title: string;
   setContent: Dispatch<SetStateAction<string>>;
   setTitle: Dispatch<SetStateAction<string>>;
-  generateSummary: () => Promise<void>;
 };
 
 export const ArticleQuizGenerator = ({
@@ -20,8 +23,35 @@ export const ArticleQuizGenerator = ({
   setContent,
   setTitle,
   title,
-  generateSummary,
 }: ArticleQuizGeneratorProps) => {
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState<string | undefined>(undefined);
+
+  const { user } = useUser();
+  const userId = user?.id;
+
+  const handleProcessArticle = async () => {
+    try {
+      setLoading(true);
+      const summary = await generateSummary({ content });
+      setSummary(summary);
+      const result = await saveArticleAction({
+        title,
+        content,
+        summary,
+        userId,
+      });
+
+      if (result.success) {
+        alert("Article saved successfully!");
+        setSuccess(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Workflow failed", err);
+    }
+  };
   return (
     <div className="w-full">
       <div className="w-fit max-w-300 mx-auto p-7 flex flex-col gap-5 h-fit rounded-lg border border-[#e7e7e7]">
@@ -34,47 +64,59 @@ export const ArticleQuizGenerator = ({
               Article Quiz Generator
             </h1>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-            Paste your article below to generate a summary and quiz question.
-            Your articles will be saved in the sidebar for future reference.
-          </p>
+          {success ? null : (
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              Paste your article below to generate a summary and quiz question.
+              Your articles will be saved in the sidebar for future reference.
+            </p>
+          )}
         </div>
-        <div className="flex flex-col gap-5 px-6 py-5">
-          <div className="flex flex-col gap-2">
-            <Label>
-              <FileText className="h-3.5 w-3.5" />
-              Article Title
-            </Label>
-            <Input
-              className="border border-zinc-200"
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter a title for your article..."
-              value={title}
-            />
+        {!success ? (
+          <div className="flex flex-col gap-5 px-6 py-5">
+            <div className="flex flex-col gap-2">
+              <Label>
+                <FileText className="h-3.5 w-3.5" />
+                Article Title
+              </Label>
+              <Input
+                className="border border-zinc-200"
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter a title for your article..."
+                value={title}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>
+                <FileText className="h-3.5 w-3.5" />
+                Article Content
+              </Label>
+              <Textarea
+                className="border border-zinc-200"
+                rows={6}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Paste your article content here..."
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                onClick={handleProcessArticle}
+                className={`${loading ? "bg-purple-300 text-white" : ""}hover:bg-purple-300 p-3 rounded-xl cursor-pointer hover:text-white`}
+              >
+                <Sparkles
+                  className={`${loading ? "text-white" : "text-black"} hover:text-white h-4 w-4`}
+                />
+                {loading ? (
+                  <LoaderCircle className="animate-spin text-white" />
+                ) : (
+                  "Generate summary"
+                )}
+              </Button>
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Label>
-              <FileText className="h-3.5 w-3.5" />
-              Article Content
-            </Label>
-            <Textarea
-              className="border border-zinc-200"
-              rows={6}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Paste your article content here..."
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button
-              onClick={generateSummary}
-              className="hover:bg-purple-300 p-3 rounded-xl cursor-pointer hover:text-white"
-            >
-              <Sparkles className="h-4 w-4" />
-              Generate summary
-            </Button>
-          </div>
-        </div>
+        ) : (
+          <ArticleGeneratorSuccess title={title} summary={summary} />
+        )}
       </div>
     </div>
   );
