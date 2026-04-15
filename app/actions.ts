@@ -10,6 +10,10 @@ type ArticleData = {
 };
 
 export async function saveArticleAction(data: ArticleData) {
+  if (data.title === "" || data.content === "") {
+    console.log("Title and content cannot be blank");
+    return { succes: false, error: "Cannot be blank" };
+  }
   try {
     const savedArticle = await prisma.article.create({
       data: {
@@ -21,6 +25,19 @@ export async function saveArticleAction(data: ArticleData) {
     });
 
     return { success: true, data: savedArticle };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, error: "Failed to save article" };
+  }
+}
+
+export async function getArticles() {
+  try {
+    const articles = await prisma.article.findMany();
+
+    console.log(articles);
+
+    return { data: articles };
   } catch (error) {
     console.error("Database Error:", error);
     return { success: false, error: "Failed to save article" };

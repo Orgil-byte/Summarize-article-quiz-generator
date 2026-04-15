@@ -4,14 +4,27 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getArticles } from "../actions";
+
+type Articles = {
+  id: number;
+  title: string;
+  content: string;
+  summary: string | null;
+  userId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export function AppSidebar() {
   const [sidebarActive, setSidebarActive] = useState(false);
+  const [articlesData, setArticlesData] = useState<Articles[] | undefined>(
+    undefined,
+  );
 
   const handleSideBar = () => {
     if (sidebarActive === false) {
@@ -21,6 +34,21 @@ export function AppSidebar() {
     }
   };
 
+  useEffect(() => {
+    const fetchArticlesData = async () => {
+      const response = await getArticles();
+
+      if (response.data) {
+        setArticlesData(response.data);
+      }
+    };
+
+    fetchArticlesData();
+  }, []);
+
+  const sorted = articlesData?.sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+  );
   return (
     <Sidebar
       collapsible="icon"
@@ -41,10 +69,16 @@ export function AppSidebar() {
       </SidebarHeader>
       {sidebarActive === true ? (
         <SidebarContent className="w-full h-fit flex flex-col gap-1 p-2">
-          <div className="h-11 w-full font-medium text-base">Genghis khan</div>
-          <div className="h-11 w-full font-medium text-base">Genghis khan</div>
-          <div className="h-11 w-full font-medium text-base">Genghis khan</div>
-          <div className="h-11 w-full font-medium text-base">Genghis khan</div>
+          {sorted?.map((article) => {
+            return (
+              <div
+                key={article.id}
+                className="h-11 w-full font-medium text-base hover:bg-neutral-200 cursor-pointer transition-colors duration-200 ease-out pt-2.5 pl-3"
+              >
+                {article.title}
+              </div>
+            );
+          })}
         </SidebarContent>
       ) : null}
       <SidebarFooter />

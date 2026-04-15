@@ -118,13 +118,17 @@ export const ArticleQuizGenerator = ({
                 placeholder="Paste your article content here..."
               />
             </div>
-            <div className="flex justify-between">
-              <Button
-                onClick={seeSuccessOneMore}
-                className="border text-amber-900 border-[#e7e7e7] py-2 px-4 cursor-pointer hover:border-purple-500 transition-colors duration-200 ease-out"
-              >
-                See already generated summary
-              </Button>
+            <div
+              className={`flex ${success ? "justify-between" : "justify-end"}`}
+            >
+              {success ? (
+                <Button
+                  onClick={seeSuccessOneMore}
+                  className="border text-amber-900 border-[#e7e7e7] py-2 px-4 cursor-pointer hover:border-purple-500 transition-colors duration-200 ease-out"
+                >
+                  See already generated summary
+                </Button>
+              ) : null}
               <Button
                 onClick={handleProcessArticle}
                 className={`${loading ? "bg-purple-300 text-white" : ""}hover:bg-purple-300 p-3 rounded-xl cursor-pointer hover:text-white`}
