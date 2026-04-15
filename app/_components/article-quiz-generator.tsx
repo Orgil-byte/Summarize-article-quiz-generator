@@ -2,14 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, FileText, LoaderCircle } from "lucide-react";
+import { Sparkles, FileText, LoaderCircle, ChevronLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dispatch, SetStateAction, useState } from "react";
 import { generateSummary } from "../utils/generateSummary";
-import { saveArticleAction } from "../api/routes/article-quiz.routes";
+
 import { useUser } from "@clerk/nextjs";
 import { ArticleGeneratorSuccess } from "./articleGeneratorSuccess";
+import { saveArticleAction } from "../actions";
 
 type ArticleQuizGeneratorProps = {
   content: string;
@@ -30,6 +31,14 @@ export const ArticleQuizGenerator = ({
 
   const { user } = useUser();
   const userId = user?.id;
+
+  const goBack = () => {
+    setSuccess(false);
+  };
+
+  const seeSuccessOneMore = () => {
+    setSuccess(true);
+  };
 
   const handleProcessArticle = async () => {
     try {
@@ -55,6 +64,17 @@ export const ArticleQuizGenerator = ({
   return (
     <div className="w-full">
       <div className="w-fit max-w-300 mx-auto p-7 flex flex-col gap-5 h-fit rounded-lg border border-[#e7e7e7]">
+        {success ? (
+          <button
+            onClick={goBack}
+            className="rounded-md py-1 px-2 border border-neutral-600 w-fit"
+          >
+            <ChevronLeft
+              strokeWidth={1.5}
+              className="text-neutral-400 hover:text-black transition-colors duration-200 ease-out cursor-pointer"
+            />
+          </button>
+        ) : null}
         <div className="border-b border-zinc-100 px-6 py-5">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100">
@@ -98,7 +118,13 @@ export const ArticleQuizGenerator = ({
                 placeholder="Paste your article content here..."
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+              <Button
+                onClick={seeSuccessOneMore}
+                className="border text-amber-900 border-[#e7e7e7] py-2 px-4 cursor-pointer hover:border-purple-500 transition-colors duration-200 ease-out"
+              >
+                See already generated summary
+              </Button>
               <Button
                 onClick={handleProcessArticle}
                 className={`${loading ? "bg-purple-300 text-white" : ""}hover:bg-purple-300 p-3 rounded-xl cursor-pointer hover:text-white`}
