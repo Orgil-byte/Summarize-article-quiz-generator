@@ -25,6 +25,12 @@ export function AppSidebar() {
   const [articlesData, setArticlesData] = useState<Articles[] | undefined>(
     undefined,
   );
+  const [id, setId] = useState<number | undefined>();
+
+  const setIdByClick = (id: number | undefined) => {
+    setId(id);
+    console.log(id);
+  };
 
   const handleSideBar = () => {
     if (sidebarActive === false) {
@@ -68,10 +74,11 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       {sidebarActive === true ? (
-        <SidebarContent className="w-full h-fit flex flex-col gap-1 p-2">
+        <SidebarContent className="w-full h-screen overflow-y-scroll flex flex-col gap-1 p-2">
           {sorted?.map((article) => {
             return (
               <div
+                onClick={() => setIdByClick(article.id)}
                 key={article.id}
                 className="h-11 w-full font-medium text-base hover:bg-neutral-200 cursor-pointer transition-colors duration-200 ease-out pt-2.5 pl-3"
               >

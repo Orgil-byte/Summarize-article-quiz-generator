@@ -28,15 +28,18 @@ export const ArticleQuizGenerator = ({
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | undefined>(undefined);
+  const [active, setActive] = useState(false);
 
   const { user } = useUser();
   const userId = user?.id;
 
   const goBack = () => {
+    setActive(true);
     setSuccess(false);
   };
 
   const seeSuccessOneMore = () => {
+    setActive(false);
     setSuccess(true);
   };
 
@@ -121,7 +124,7 @@ export const ArticleQuizGenerator = ({
             <div
               className={`flex ${success ? "justify-between" : "justify-end"}`}
             >
-              {success ? (
+              {active ? (
                 <Button
                   onClick={seeSuccessOneMore}
                   className="border text-amber-900 border-[#e7e7e7] py-2 px-4 cursor-pointer hover:border-purple-500 transition-colors duration-200 ease-out"

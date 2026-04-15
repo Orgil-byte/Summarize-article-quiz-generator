@@ -35,7 +35,18 @@ export async function getArticles() {
   try {
     const articles = await prisma.article.findMany();
 
-    console.log(articles);
+    return { data: articles };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, error: "Failed to save article" };
+  }
+}
+
+export async function getArticleById(id: number | undefined) {
+  try {
+    const articles = await prisma.article.findUnique({
+      where: { id: id },
+    });
 
     return { data: articles };
   } catch (error) {
