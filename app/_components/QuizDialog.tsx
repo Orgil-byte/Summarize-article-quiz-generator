@@ -18,6 +18,7 @@ type QuizDialogProps = {
   onClose: () => void;
   questions: QuizQuestion[];
   isLoading: boolean;
+  onComplete?: (userAnswers: string[], questions: QuizQuestion[]) => void;
 };
 
 export const QuizDialog = ({
@@ -25,6 +26,7 @@ export const QuizDialog = ({
   onClose,
   questions,
   isLoading,
+  onComplete,
 }: QuizDialogProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
@@ -38,6 +40,7 @@ export const QuizDialog = ({
 
     if (currentIndex + 1 >= questions.length) {
       setIsCompleted(true);
+      onComplete?.(newAnswers, questions);
     } else {
       setCurrentIndex(currentIndex + 1);
     }
@@ -79,6 +82,7 @@ export const QuizDialog = ({
         </div>
 
         <div className="border-t border-gray-100" />
+
         {isLoading ? (
           <div className="p-10 flex flex-col items-center justify-center gap-3 text-gray-400">
             <LoaderCircle className="h-6 w-6 animate-spin text-blue-400" />

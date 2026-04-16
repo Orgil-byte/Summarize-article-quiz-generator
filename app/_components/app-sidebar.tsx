@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { getArticles } from "../actions";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // ✅ added usePathname
 import { useUser } from "@clerk/nextjs";
 
 type Articles = {
@@ -24,6 +24,7 @@ type Articles = {
 
 export function AppSidebar() {
   const router = useRouter();
+  const pathname = usePathname(); // ✅ track current route
   const { user } = useUser();
   const userId = user?.id;
 
@@ -50,7 +51,7 @@ export function AppSidebar() {
     };
 
     fetchArticlesData();
-  }, [userId]);
+  }, [userId, pathname]);
 
   const sorted = articlesData?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),

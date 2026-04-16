@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { ArticleGeneratorSuccess } from "../_components/articleGeneratorSuccess";
 import { useParams } from "next/navigation";
+import { getArticleById } from "../actions"; // ✅ use server action
 
 const ArticleQuizGeneratorId = () => {
   const [success, setSuccess] = useState(false);
@@ -20,11 +21,12 @@ const ArticleQuizGeneratorId = () => {
 
   useEffect(() => {
     if (params?.id) {
-      fetch(`http://localhost:3000/${params.id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Fetched Data:", data);
-          setDataById(data);
+      const id = Number(params.id);
+      getArticleById(id)
+        .then((res) => {
+          if (res.data) {
+            setDataById(res.data as ArticleWithQuizzes);
+          }
         })
         .catch((err) => console.error("Fetch error:", err));
     }
@@ -77,12 +79,7 @@ const ArticleQuizGeneratorId = () => {
                 <FileText className="h-3.5 w-3.5" />
                 Article Title
               </Label>
-              <Input
-                className="border border-zinc-200"
-                readOnly
-                placeholder="Enter a title for your article..."
-                value={dataById?.title}
-              />
+              <div className="border border-zinc-200">{dataById?.title}</div>
             </div>
             <div className="flex flex-col gap-2">
               <Label>
