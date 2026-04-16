@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dialog";
 
 type ArticleGeneratorSuccessProps = {
-  title: string;
-  summary: string | undefined;
+  title: string | undefined;
+  summary: string | undefined | null;
 };
 
 export const ArticleGeneratorSuccess = ({

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { getArticles } from "../actions";
+import { useRouter } from "next/navigation";
 
 type Articles = {
   id: number;
@@ -21,6 +22,8 @@ type Articles = {
 };
 
 export function AppSidebar() {
+  const router = useRouter();
+
   const [sidebarActive, setSidebarActive] = useState(false);
   const [articlesData, setArticlesData] = useState<Articles[] | undefined>(
     undefined,
@@ -29,6 +32,9 @@ export function AppSidebar() {
 
   const setIdByClick = (id: number | undefined) => {
     setId(id);
+
+    router.push(`/${id}`);
+
     console.log(id);
   };
 

@@ -10,6 +10,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./_components/app-sidebar";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,10 @@ export default function RootLayout({
               </Show>
               <Show when="signed-in">
                 <div className="w-full flex justify-between items-center">
-                  <h1 className="font-medium text-[24px]">Quiz app</h1>
+                  <Link href={"/"}>
+                    <h1 className="font-medium text-[24px]">Quiz app</h1>
+                  </Link>
+
                   <UserButton />
                 </div>
               </Show>
