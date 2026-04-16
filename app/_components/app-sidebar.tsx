@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { getArticles } from "../actions";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 type Articles = {
   id: number;
@@ -23,27 +24,20 @@ type Articles = {
 
 export function AppSidebar() {
   const router = useRouter();
+  const { user } = useUser();
+  const userId = user?.id;
 
   const [sidebarActive, setSidebarActive] = useState(false);
   const [articlesData, setArticlesData] = useState<Articles[] | undefined>(
     undefined,
   );
-  const [id, setId] = useState<number | undefined>();
 
   const setIdByClick = (id: number | undefined) => {
-    setId(id);
-
     router.push(`/${id}`);
-
-    console.log(id);
   };
 
   const handleSideBar = () => {
-    if (sidebarActive === false) {
-      setSidebarActive(true);
-    } else {
-      setSidebarActive(false);
-    }
+    setSidebarActive((prev) => !prev);
   };
 
   useEffect(() => {
@@ -51,16 +45,17 @@ export function AppSidebar() {
       const response = await getArticles();
 
       if (response.data) {
-        setArticlesData(response.data);
+        setArticlesData(response.data as Articles[]);
       }
     };
 
     fetchArticlesData();
-  }, []);
+  }, [userId]);
 
   const sorted = articlesData?.sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+
   return (
     <Sidebar
       collapsible="icon"
@@ -81,8 +76,14 @@ export function AppSidebar() {
       </SidebarHeader>
       {sidebarActive === true ? (
         <SidebarContent className="w-full h-screen overflow-y-scroll flex flex-col gap-1 p-2">
-          {sorted?.map((article) => {
-            return (
+          {!userId ? (
+            <p className="text-sm text-zinc-400 px-3 pt-2">
+              Sign in to see your articles.
+            </p>
+          ) : sorted?.length === 0 ? (
+            <p className="text-sm text-zinc-400 px-3 pt-2">No articles yet.</p>
+          ) : (
+            sorted?.map((article) => (
               <div
                 onClick={() => setIdByClick(article.id)}
                 key={article.id}
@@ -90,8 +91,8 @@ export function AppSidebar() {
               >
                 {article.title}
               </div>
-            );
-          })}
+            ))
+          )}
         </SidebarContent>
       ) : null}
       <SidebarFooter />

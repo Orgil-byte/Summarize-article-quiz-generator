@@ -114,6 +114,8 @@ const ArticleQuizGeneratorId = () => {
           <ArticleGeneratorSuccess
             title={dataById?.title}
             summary={dataById?.summary}
+            content={dataById?.content}
+            articleId={dataById?.id}
           />
         )}
       </div>

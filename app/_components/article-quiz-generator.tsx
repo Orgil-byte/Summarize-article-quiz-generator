@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dispatch, SetStateAction, useState } from "react";
 import { generateSummary } from "../utils/generateSummary";
-
 import { useUser } from "@clerk/nextjs";
 import { ArticleGeneratorSuccess } from "./articleGeneratorSuccess";
 import { saveArticleAction } from "../actions";
@@ -29,6 +28,9 @@ export const ArticleQuizGenerator = ({
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | undefined>(undefined);
   const [active, setActive] = useState(false);
+  const [savedArticleId, setSavedArticleId] = useState<number | undefined>(
+    undefined,
+  );
 
   const { user } = useUser();
   const userId = user?.id;
@@ -46,24 +48,26 @@ export const ArticleQuizGenerator = ({
   const handleProcessArticle = async () => {
     try {
       setLoading(true);
-      const summary = await generateSummary({ content });
-      setSummary(summary);
+      const generatedSummary = await generateSummary({ content });
+      setSummary(generatedSummary);
       const result = await saveArticleAction({
         title,
         content,
-        summary,
+        summary: generatedSummary,
         userId,
       });
 
-      if (result.success) {
-        alert("Article saved successfully!");
+      if (result.success && result.data) {
+        setSavedArticleId(result.data.id);
         setSuccess(true);
         setLoading(false);
       }
     } catch (err) {
       console.error("Workflow failed", err);
+      setLoading(false);
     }
   };
+
   return (
     <div className="w-full">
       <div className="w-fit max-w-300 mx-auto p-7 flex flex-col gap-5 h-fit rounded-lg border border-[#e7e7e7]">
@@ -148,7 +152,12 @@ export const ArticleQuizGenerator = ({
             </div>
           </div>
         ) : (
-          <ArticleGeneratorSuccess title={title} summary={summary} />
+          <ArticleGeneratorSuccess
+            title={title}
+            summary={summary}
+            content={content}
+            articleId={savedArticleId}
+          />
         )}
       </div>
     </div>

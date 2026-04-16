@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import type { QuizQuestion } from "./utils/generateQuiz";
 
 type ArticleData = {
   title: string;
@@ -34,23 +35,48 @@ export async function saveArticleAction(data: ArticleData) {
 export async function getArticles() {
   try {
     const articles = await prisma.article.findMany();
-
     return { data: articles };
   } catch (error) {
     console.error("Database Error:", error);
-    return { success: false, error: "Failed to save article" };
+    return { success: false, error: "Failed to fetch articles" };
   }
 }
 
 export async function getArticleById(id: number | undefined) {
   try {
-    const articles = await prisma.article.findUnique({
-      where: { id: id },
+    const article = await prisma.article.findUnique({
+      where: { id },
+      include: { quizzes: true },
     });
-
-    return { data: articles };
+    return { data: article };
   } catch (error) {
     console.error("Database Error:", error);
-    return { success: false, error: "Failed to save article" };
+    return { success: false, error: "Failed to fetch article" };
+  }
+}
+
+export async function saveQuizzesAction({
+  questions,
+  articleId,
+}: {
+  questions: QuizQuestion[];
+  articleId: number;
+}) {
+  try {
+    await prisma.quiz.deleteMany({ where: { articleId } });
+
+    const saved = await prisma.quiz.createMany({
+      data: questions.map((q) => ({
+        question: q.question,
+        options: q.options,
+        answer: q.answer,
+        articleId,
+      })),
+    });
+
+    return { success: true, data: saved };
+  } catch (error) {
+    console.error("Database Error:", error);
+    return { success: false, error: "Failed to save quizzes" };
   }
 }
