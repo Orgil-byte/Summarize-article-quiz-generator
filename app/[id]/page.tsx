@@ -1,14 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Sparkles, FileText, ChevronLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { ArticleGeneratorSuccess } from "../_components/articleGeneratorSuccess";
 import { useParams } from "next/navigation";
-import { getArticleById } from "../actions"; // ✅ use server action
+import { getArticleById } from "../actions";
 
 const ArticleQuizGeneratorId = () => {
   const [success, setSuccess] = useState(false);
